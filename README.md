@@ -1,6 +1,10 @@
 # Learning-Augmented Optimization Solvers
 
 <!-- portfolio-umbrella:start -->
+## CI and consolidated-snapshot quality policy
+
+The root integration package (`src/`, `tests/`, `scripts/`) is the **native maintained research system**. Its CI checks lint and tests on Python 3.11 and 3.12. Projects in `projects/` are provenance-preserving imported snapshots; their upstream formatting and optional heavyweight dependencies are not asserted to satisfy the umbrella package's Ruff rules. The previous unscoped `ruff check .` blocked native tests on 54 lint findings in preserved imported projects. Narrowing root CI does **not** resolve or conceal those issues as defects of the snapshots. Run `ruff check projects` to reproduce the snapshot lint findings, and validate a snapshot using its own documented dependencies and test protocol before using its results in publications. Changes to active snapshots should be reviewed in their own test matrix.
+
 ## Portfolio role
 
 This repository is the primary umbrella repository for Jors Academy work on **learning inside and around exact optimization solvers**. The original recovered projects are preserved under `projects/`; new work should extend this monorepo rather than create another near-duplicate solver-learning repository.
