@@ -47,7 +47,11 @@ def _redundant_rows(A: np.ndarray, b: np.ndarray) -> tuple[set[int], int]:
             if i == j or i in redundant:
                 continue
             checks += A.shape[1]
-            if np.all(A[j] >= A[i] - 1e-12) and b[j] <= b[i] + 1e-12:
+            # Equivalent rows must not eliminate each other: keep the
+            # lowest-index representative for deterministic residual models.
+            dominates = np.all(A[j] >= A[i] - 1e-12) and b[j] <= b[i] + 1e-12
+            strictly_stronger = np.any(A[j] > A[i] + 1e-12) or b[j] < b[i] - 1e-12
+            if dominates and (strictly_stronger or j < i):
                 redundant.add(i)
                 break
     return redundant, checks
@@ -66,8 +70,16 @@ def apply_presolve(problem: BinaryPackingMIP, config: PresolveConfig) -> Presolv
     checks = 0
 
     if config in {"fixing", "full"}:
-        fixed, fixing_checks = _safe_fixings(problem)
+        candidate_fixings, fixing_checks = _safe_fixings(problem)
         checks += fixing_checks
+        # The native exact solver represents residuals with at least two
+        # variables. A safe fixing can be deliberately skipped without changing
+        # the optimum; retain two deterministic candidates rather than creating
+        # an invalid zero- or one-variable residual model.
+        n_to_keep = max(0, 2 - (problem.n_vars - len(candidate_fixings)))
+        for original in sorted(candidate_fixings, reverse=True)[:n_to_keep]:
+            del candidate_fixings[original]
+        fixed = candidate_fixings
         for original, value in fixed.items():
             if value == 1:
                 b -= A[:, original]

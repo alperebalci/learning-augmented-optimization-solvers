@@ -33,3 +33,7 @@ independent feasibility / bound check
 ```
 
 When learning changes only ordering—branching, node search, cut ranking—the exact solver should remain responsible for the mathematical validity of every accepted action.
+
+## Executable native matched-control study
+
+Use [matched-solver-study.md](matched-solver-study.md) and [the research runner](../scripts/matched_solver_study.py) for a controlled classical-versus-expert comparison, optionally including learned components. The CI fixture verifies correctness on tiny instances; it does not assert general solver superiority.

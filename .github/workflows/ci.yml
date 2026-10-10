@@ -25,4 +25,4 @@ jobs:
       - name: Lint native integration code
         run: ruff check src tests scripts
       - name: Test native integration code
-        run: pytest -q tests
+        run: python -m pytest -q tests
