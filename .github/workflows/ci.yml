@@ -19,5 +19,10 @@ jobs:
           cache: pip
       - run: python -m pip install --upgrade pip
       - run: pip install -e ".[dev]"
-      - run: ruff check .
-      - run: pytest -q
+      # Root CI validates the actively maintained integration package.
+      # Imported projects/ are provenance-preserving source snapshots with
+      # independent dependency / lint conventions and must be audited separately.
+      - name: Lint native integration code
+        run: ruff check src tests scripts
+      - name: Test native integration code
+        run: pytest -q tests
